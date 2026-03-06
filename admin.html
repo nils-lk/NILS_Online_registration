@@ -1,218 +1,402 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>NILS Admin Dashboard - Edit & Manage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NILS Admin Portal | Secure Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary: #003366;
+            --accent: #ffcc00;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text-dark: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f1f5f9;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            margin: 0;
             padding: 20px;
+            top: 0 !important;
+        }
+
+        .dashboard-container {
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-        }
-
-        .admin-box {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
             margin-bottom: 30px;
+            background: var(--primary);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            border-bottom: 5px solid var(--accent);
         }
 
-        h2 {
-            color: #003366;
-            text-align: center;
-            border-bottom: 2px solid #ffcc00;
-            padding-bottom: 10px;
+        header h1 {
+            font-size: 1.4rem;
+            margin: 0;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 25px;
+        }
+
+        .admin-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            margin-top: 12px;
-            font-weight: bold;
             font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #64748b;
         }
 
         input,
         select,
         textarea {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            outline: none;
         }
 
-        .btn-container {
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1);
+        }
+
+        .btn-stack {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
 
-        .save-btn {
-            flex: 2;
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
+        button {
             cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-weight: 600;
+            transition: 0.3s;
+            flex: 1;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #002244;
+            transform: translateY(-2px);
         }
 
         .cancel-btn {
-            flex: 1;
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
+            background: #e2e8f0;
+            color: #475569;
             display: none;
+        }
+
+        .table-container {
+            background: var(--card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
 
         table {
             width: 100%;
-            max-width: 1000px;
-            background: white;
             border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border: 1px solid #eee;
-            text-align: left;
-            font-size: 13px;
         }
 
         th {
-            background: #003366;
-            color: white;
+            background: #f8fafc;
+            color: #64748b;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
         }
 
         .action-btns {
             display: flex;
-            gap: 5px;
+            gap: 8px;
+            justify-content: center;
         }
 
-        .btn-edit {
-            background: #ffc107;
-            color: black;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-weight: bold;
+            border: none;
+            transition: 0.2s;
+            flex: none;
         }
 
-        .btn-del {
-            background: #dc3545;
+        .edit-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .del-icon {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .edit-icon:hover {
+            background: var(--warning);
             color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
         }
 
-        #loading {
-            font-weight: bold;
-            color: #003366;
-            margin-bottom: 10px;
+        .del-icon:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-cat-group {
+            display: none;
+            margin-top: 10px;
+            background: #fffcf0;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px dashed var(--warning);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="admin-box">
-        <h2 id="formTitle">Add New Programme</h2>
-        <form id="adminForm">
-            <input type="hidden" id="rowId">
-
-            <label>Course Name</label><input type="text" id="name" required>
-
-            <label>Category</label>
-            <select id="category">
-                <option>One Day Programs</option>
-                <option>Two Day Programs</option>
-                <option>Three Day Programs</option>
-                <option>Five Day Programs</option>
-                <option>Diploma</option>
-                <option>Workshops</option>
-                <option>Certificate Courses</option>
-            </select>
-
-            <label>Description</label><textarea id="description" rows="3"></textarea>
-
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1;"><label>Date</label><input type="text" id="date"></div>
-                <div style="flex:1;"><label>Time</label><input type="text" id="time"></div>
-            </div>
-
-            <label>Location</label><input type="text" id="location" value="NILS Auditorium">
-            <label>Price (LKR)</label><input type="number" id="price" required>
-
-            <label>Installments Available?</label>
-            <select id="installments">
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-            </select>
-
-            <label>Apply Link</label><input type="url" id="apply_link">
-            <label>Image URL (Google Drive Link)</label><input type="url" id="image_url">
-
-            <div class="btn-container">
-                <button type="submit" id="saveBtn" class="save-btn">Save Programme</button>
-                <button type="button" id="cancelBtn" class="cancel-btn" onclick="resetForm()">Cancel Edit</button>
-            </div>
-        </form>
+    <div id="overlay">
+        <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary);"></i>
+        <p id="loaderText" style="margin-top: 15px; font-weight: 600; color: var(--primary);">Processing Request...</p>
     </div>
 
-    <div id="loading">දත්ත ලබාගනිමින් පවතී...</div>
+    <div class="dashboard-container">
+        <header>
+            <h1><i class="fas fa-shield-alt"></i> NILS Programme Manager</h1>
+            <div style="font-size: 0.8rem;"><i class="fas fa-circle" style="color: #10b981;"></i> System Online</div>
+        </header>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+        <div class="main-layout">
+            <div class="admin-card">
+                <h2 id="formTitle" style="margin-top:0; font-size: 1.1rem; margin-bottom: 20px; color: var(--primary);">
+                    Add New Programme</h2>
+                <form id="adminForm">
+                    <input type="hidden" id="rowId">
+
+                    <div class="form-group">
+                        <label>Programme Name</label>
+                        <input type="text" id="name" placeholder="Enter course title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="category" onchange="checkCategory(this.value)">
+                            <option value="One Day Programs">One Day Programs</option>
+                            <option value="Two Day Programs">Two Day Programs</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Workshops">Workshops</option>
+                            <option value="Certificate Courses">Certificate Courses</option>
+                            <option value="NEW">-- Add New Category --</option>
+                        </select>
+                        <div id="customCatGroup" class="custom-cat-group">
+                            <label style="color: var(--warning);">New Category Name:</label>
+                            <input type="text" id="customCategory" placeholder="Enter category">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="description" rows="3" placeholder="Course details..."></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Date (YYYY.MM.DD)</label>
+                            <input type="date" id="datePicker" onchange="formatDate(this.value)">
+                            <input type="text" id="dateText" style="margin-top:5px; font-size: 0.8rem;"
+                                placeholder="YYYY.MM.DD">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Time</label>
+                            <input type="time" id="timePicker" onchange="syncTime(this.value)">
+                            <input type="text" id="timeText" style="margin-top:5px; font-size: 0.8rem;"
+                                placeholder="Manual time/range">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="location" value="NILS Auditorium">
+                    </div>
+
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Price (LKR)</label>
+                            <input type="number" id="price" required>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Installments</label>
+                            <select id="installments">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apply Link</label>
+                        <input type="url" id="apply_link" placeholder="Paste link here">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="image_url" placeholder="Paste image link">
+                    </div>
+
+                    <div class="btn-stack">
+                        <button type="button" id="cancelBtn" class="cancel-btn" onclick="resetForm()">Cancel
+                            Edit</button>
+                        <button type="submit" id="saveBtn" class="save-btn">Save Programme</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Programme Info</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding:50px;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxlMiseZ5YjuzOFeNWSaJ5mqQ-EC5tWGIsFbRMGpTCBeGhiqZLLBJRI-Ch2ib6NjFEA/exec";
+        const SECURITY_PIN = "456789";
 
-        // 1. දත්ත ඇතුළත් කිරීම හෝ වෙනස් කිරීම (Add or Update)
+        // Right Click & Inspect Block
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = e => {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) || (e.ctrlKey && e.keyCode == 85)) return false;
+        };
+
+        function checkCategory(val) {
+            document.getElementById('customCatGroup').style.display = (val === "NEW") ? "block" : "none";
+        }
+
+        // Date formatting function (YYYY-MM-DD to YYYY.MM.DD)
+        function formatDate(val) {
+            if (!val) return;
+            const formatted = val.replace(/-/g, '.');
+            document.getElementById('dateText').value = formatted;
+        }
+
+        function syncTime(val) { document.getElementById('timeText').value = val; }
+
+        function showLoader(text) {
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('loaderText').innerText = text;
+        }
+
+        function verifyPIN() {
+            const input = prompt("Security Alert: Enter Admin PIN to confirm:");
+            if (input === SECURITY_PIN) return true;
+            if (input !== null) alert("Invalid PIN.");
+            return false;
+        }
+
         document.getElementById('adminForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const rowId = document.getElementById('rowId').value;
-            const btn = document.getElementById('saveBtn');
+            if (!verifyPIN()) return;
 
-            btn.disabled = true;
-            btn.innerText = rowId ? "Updating..." : "Saving...";
+            const rowId = document.getElementById('rowId').value;
+            showLoader(rowId ? "Updating..." : "Saving...");
+
+            let finalCategory = document.getElementById('category').value;
+            if (finalCategory === "NEW") finalCategory = document.getElementById('customCategory').value;
 
             const payload = {
                 action: rowId ? "update" : "add",
                 rowId: parseInt(rowId),
-                category: document.getElementById('category').value,
+                category: finalCategory,
                 name: document.getElementById('name').value,
                 description: document.getElementById('description').value,
-                date: document.getElementById('date').value,
-                time: document.getElementById('time').value,
+                date: document.getElementById('dateText').value,
+                time: document.getElementById('timeText').value,
                 location: document.getElementById('location').value,
                 price: document.getElementById('price').value,
                 installments: document.getElementById('installments').value,
@@ -220,86 +404,89 @@
                 image_url: document.getElementById('image_url').value
             };
 
-            await fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            });
-
-            alert(rowId ? "සාර්ථකව වෙනස් කළා!" : "සාර්ථකව ඇතුළත් කළා!");
-            resetForm();
-            loadAdminTable();
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("Success!");
+                window.location.reload();
+            } catch (err) {
+                alert("Error!");
+                document.getElementById('overlay').style.display = 'none';
+            }
         });
 
-        // 2. දැනට ඇති දත්ත ලැයිස්තුව පෙන්වීම
         async function loadAdminTable() {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
                 const tableBody = document.getElementById('tableBody');
 
-                document.getElementById('loading').style.display = 'none';
-
                 tableBody.innerHTML = data.map(item => `
-                <tr>
-                    <td>${item.Category}</td>
-                    <td><b>${item.Name}</b></td>
-                    <td>${Number(item.Price).toLocaleString()}</td>
-                    <td class="action-btns">
-                        <button class="btn-edit" onclick='fillForm(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Edit</button>
-                        <button class="btn-del" onclick="deleteItem(${item.rowId})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
+                    <tr>
+                        <td>
+                            <div style="font-weight: 700; color: var(--primary);">${item.Name}</div>
+                            <div style="font-size: 0.75rem; color: #64748b; margin-top: 3px;">
+                                <i class="far fa-calendar-alt"></i> ${item.Date || 'N/A'} | <i class="fas fa-clock"></i> ${item.Time || 'N/A'}
+                            </div>
+                        </td>
+                        <td><span style="background: #eef2ff; color: #4338ca; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">${item.Category}</span></td>
+                        <td style="font-weight: 700;">LKR ${Number(item.Price).toLocaleString()}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon edit-icon" onclick='fillForm(${JSON.stringify(item).replace(/'/g, "&apos;")})'><i class="fas fa-pen"></i></button>
+                                <button class="btn-icon del-icon" onclick="deleteItem(${item.rowId})"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
             } catch (err) {
-                document.getElementById('loading').innerText = "දත්ත ලබාගැනීමට නොහැකි විය.";
+                tableBody.innerHTML = "Error loading data.";
             }
         }
 
-        // 3. Edit බටන් එක එබූ විට Form එක පිරවීම
         function fillForm(item) {
             document.getElementById('rowId').value = item.rowId;
             document.getElementById('name').value = item.Name;
-            document.getElementById('category').value = item.Category;
+
+            const catSelect = document.getElementById('category');
+            const exists = Array.from(catSelect.options).some(opt => opt.value === item.Category);
+            catSelect.value = exists ? item.Category : "NEW";
+            checkCategory(catSelect.value);
+            if (!exists) document.getElementById('customCategory').value = item.Category;
+
             document.getElementById('description').value = item.Description || "";
-            document.getElementById('date').value = item.Date || "";
-            document.getElementById('time').value = item.Time || "";
+            document.getElementById('dateText').value = item.Date || "";
+            document.getElementById('timeText').value = item.Time || "";
             document.getElementById('location').value = item.Location || "";
             document.getElementById('price').value = item.Price;
             document.getElementById('installments').value = item.Installments || "Yes";
             document.getElementById('apply_link').value = item.Apply_Link || "";
             document.getElementById('image_url').value = item.Image_URL || "";
 
-            document.getElementById('formTitle').innerText = "Edit Programme";
-            document.getElementById('saveBtn').innerText = "Update Changes";
-            document.getElementById('saveBtn').style.background = "#ffc107";
-            document.getElementById('saveBtn').style.color = "black";
+            document.getElementById('formTitle').innerText = "Edit: " + item.Name;
+            document.getElementById('saveBtn').innerText = "Update Now";
+            document.getElementById('saveBtn').style.background = "var(--warning)";
             document.getElementById('cancelBtn').style.display = "block";
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 4. Form එක මුල් තත්වයට පත් කිරීම
         function resetForm() {
             document.getElementById('adminForm').reset();
             document.getElementById('rowId').value = "";
             document.getElementById('formTitle').innerText = "Add New Programme";
+            document.getElementById('saveBtn').style.background = "var(--primary)";
             document.getElementById('saveBtn').innerText = "Save Programme";
-            document.getElementById('saveBtn').style.background = "#28a745";
-            document.getElementById('saveBtn').style.color = "white";
             document.getElementById('cancelBtn').style.display = "none";
+            document.getElementById('customCatGroup').style.display = "none";
         }
 
-        // 5. දත්ත පේළියක් මැකීම
         async function deleteItem(id) {
-            if (confirm("මෙම පාඨමාලාව ස්ථිරවම මකා දැමීමට අවශ්‍යද?")) {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ action: "delete", rowId: id })
-                });
-                alert("සාර්ථකව මකා දැමුවා!");
-                loadAdminTable();
+            if (confirm("Delete this?")) {
+                if (!verifyPIN()) return;
+                showLoader("Deleting...");
+                try {
+                    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", rowId: id }) });
+                    window.location.reload();
+                } catch (e) { document.getElementById('overlay').style.display = 'none'; }
             }
         }
 
