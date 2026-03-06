@@ -33,6 +33,14 @@
             top: 0 !important;
         }
 
+        /* Inspect element protection style */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
         .dashboard-container {
             max-width: 1300px;
             margin: auto;
@@ -243,6 +251,8 @@
             <div class="admin-card">
                 <h2 id="formTitle" style="margin-top:0; font-size: 1.1rem; margin-bottom: 20px; color: var(--primary);">
                     Add New Programme</h2>
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px;">Tip: For multiple categories, use a
+                    comma (e.g., Diploma, Free)</p>
                 <form id="adminForm">
                     <input type="hidden" id="rowId">
 
@@ -252,21 +262,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Category</label>
+                        <label>Category (Use comma for tags)</label>
                         <select id="category" onchange="checkCategory(this.value)">
                             <option value="One Day Programs">One Day Programs</option>
                             <option value="Two Day Programs">Two Day Programs</option>
-                            <option value="Three Day Programs">Three Day Programs</option>
-                            <option value="Four Day Programs">Four Day Programs</option>
-                            <option value="Five Day Programs">Five Day Programs</option>
                             <option value="Diploma">Diploma</option>
                             <option value="Workshops">Workshops</option>
                             <option value="Certificate Courses">Certificate Courses</option>
-                            <option value="NEW">-- Add New Category --</option>
+                            <option value="NEW">-- Add New Category / Multi-Category --</option>
                         </select>
                         <div id="customCatGroup" class="custom-cat-group">
-                            <label style="color: var(--warning);">New Category Name:</label>
-                            <input type="text" id="customCategory" placeholder="Enter category">
+                            <label style="color: var(--warning);">Custom Category / Tags:</label>
+                            <input type="text" id="customCategory" placeholder="e.g., Diploma, Free">
                         </div>
                     </div>
 
@@ -292,7 +299,7 @@
 
                     <div class="form-group">
                         <label>Location</label>
-                        <input type="text" id="location" value="NILS Narahenpita">
+                        <input type="text" id="location" value="NILS Auditorium">
                     </div>
 
                     <div style="display:flex; gap:10px;">
@@ -408,7 +415,7 @@
 
             try {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("Success!");
+                alert("Task Successful!");
                 window.location.reload();
             } catch (err) {
                 alert("Error connecting to server.");
@@ -423,7 +430,6 @@
                 const tableBody = document.getElementById('tableBody');
 
                 tableBody.innerHTML = data.map(item => {
-                    // Logic to format price properly in table
                     let displayPrice = item.Price;
                     if (!isNaN(item.Price) && item.Price !== "") {
                         displayPrice = "LKR " + Number(item.Price).toLocaleString();
@@ -459,15 +465,21 @@
 
             const catSelect = document.getElementById('category');
             const exists = Array.from(catSelect.options).some(opt => opt.value === item.Category);
-            catSelect.value = exists ? item.Category : "NEW";
-            checkCategory(catSelect.value);
-            if (!exists) document.getElementById('customCategory').value = item.Category;
+
+            if (exists) {
+                catSelect.value = item.Category;
+                checkCategory(item.Category);
+            } else {
+                catSelect.value = "NEW";
+                checkCategory("NEW");
+                document.getElementById('customCategory').value = item.Category;
+            }
 
             document.getElementById('description').value = item.Description || "";
             document.getElementById('dateText').value = item.Date || "";
             document.getElementById('timeText').value = item.Time || "";
             document.getElementById('location').value = item.Location || "";
-            document.getElementById('price').value = item.Price; // Will load number or 'Free'
+            document.getElementById('price').value = item.Price;
             document.getElementById('installments').value = item.Installments || "Yes";
             document.getElementById('apply_link').value = item.Apply_Link || "";
             document.getElementById('image_url').value = item.Image_URL || "";

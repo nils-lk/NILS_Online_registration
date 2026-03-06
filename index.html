@@ -30,7 +30,6 @@
             background-color: var(--bg);
             color: var(--text-main);
             overflow-x: hidden;
-            top: 0 !important;
         }
 
         .top-bar {
@@ -53,8 +52,6 @@
             padding: 4rem 1rem 5rem;
             text-align: center;
             border-bottom: 6px solid var(--nils-gold);
-            position: relative;
-            z-index: 10;
         }
 
         @keyframes gradientBG {
@@ -69,18 +66,6 @@
             100% {
                 background-position: 0% 50%;
             }
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        header p {
-            margin-top: 10px;
-            font-weight: 300;
-            opacity: 0.9;
         }
 
         .container {
@@ -101,35 +86,12 @@
             text-align: center;
         }
 
-        .search-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .search-wrapper i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--nils-blue);
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 15px 20px 15px 50px;
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
-            font-size: 1rem;
-            outline: none;
-            background: #f8fafc;
-            transition: 0.3s;
-        }
-
         .category-nav {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
+            margin-top: 20px;
         }
 
         .cat-pill {
@@ -151,7 +113,7 @@
 
         .course-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px;
         }
 
@@ -162,7 +124,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             display: flex;
             flex-direction: column;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.4s;
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
@@ -180,12 +142,6 @@
             cursor: zoom-in;
         }
 
-        .card-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
         .badge {
             position: absolute;
             top: 15px;
@@ -197,9 +153,15 @@
             font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
-            backdrop-filter: blur(4px);
             z-index: 5;
         }
+
+        .badge-tag {
+            top: 45px;
+            background: #ea580c;
+        }
+
+        /* දෙවැනි badge එක සඳහා */
 
         .card-body {
             padding: 25px;
@@ -208,88 +170,14 @@
             flex-direction: column;
         }
 
-        .card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--nils-blue);
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-
-        .card-desc {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-
-        .info-group {
-            margin-top: auto;
-            padding-top: 15px;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .info-row {
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #334155;
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-
         .price-tag {
             font-size: 1.6rem;
             font-weight: 800;
             color: #ea580c;
+            margin-top: 15px;
         }
 
-        .apply-btn {
-            background: var(--nils-blue);
-            color: white;
-            text-align: center;
-            padding: 14px;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-
-        /* Modal Overlay for Description */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            width: 100%;
-            max-width: 600px;
-            max-height: 85vh;
-            border-radius: 28px;
-            padding: 40px;
-            position: relative;
-            overflow-y: auto;
-        }
-
-        /* Image Viewer Modal */
+        /* Image Modal */
         .img-modal-overlay {
             position: fixed;
             top: 0;
@@ -303,25 +191,12 @@
             z-index: 3000;
         }
 
-        .img-modal-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-        }
-
-        .img-modal-content img {
-            max-width: 100%;
-            max-height: 85vh;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-        }
-
         .close-btn {
             position: absolute;
-            top: -50px;
-            right: 0;
+            top: 20px;
+            right: 30px;
             color: white;
-            font-size: 35px;
+            font-size: 40px;
             cursor: pointer;
         }
 
@@ -333,25 +208,11 @@
             margin-top: 50px;
             border-top: 5px solid var(--nils-gold);
         }
-
-        @media (max-width: 1100px) {
-            .course-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 700px) {
-            .course-grid {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 
 <body>
-
     <div class="top-bar">
-        <span style="margin-right: 10px; font-size: 0.8rem; color: #64748b; font-weight: 500;">Select Language: </span>
         <div id="google_translate_element"></div>
     </div>
 
@@ -360,66 +221,44 @@
         <p>National Institute of Labour Studies - Sri Lanka</p>
     </header>
 
-    <div class="modal-overlay" id="modalOverlay" onclick="closeDesc()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close-modal" onclick="closeDesc()" style="float:right; cursor:pointer;"><i
-                    class="fa-solid fa-circle-xmark"></i></span>
-            <h2 id="mTitle" style="color:var(--nils-blue); margin-bottom:15px;">Course Name</h2>
-            <div id="mDesc" style="line-height:1.6; color:var(--text-sub);">Description...</div>
-        </div>
-    </div>
-
-    <div class="img-modal-overlay" id="imgModal" onclick="closeImg()">
-        <div class="img-modal-content" onclick="event.stopPropagation()">
-            <span class="close-btn" onclick="closeImg()">&times;</span>
-            <img id="fullImg" src="" alt="Full View">
-        </div>
-    </div>
+    <div class="img-modal-overlay" id="imgModal" onclick="this.style.display='none'"><span
+            class="close-btn">&times;</span><img id="fullImg"
+            style="max-width:90%; max-height:85vh; border-radius:10px;"></div>
 
     <div class="container">
         <div class="controls-section">
-            <div class="search-wrapper">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="search-box" placeholder="Search for a course..."
-                    onkeyup="applyFilters()">
-            </div>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search for a course..."
+                onkeyup="applyFilters()"
+                style="width:100%; padding:15px; border-radius:14px; border:1px solid #e2e8f0; outline:none;">
             <div class="category-nav" id="categoryNav">
                 <div class="cat-pill active" onclick="setCat('All')">All Programs</div>
             </div>
         </div>
-
-        <div id="loader" style="text-align:center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-        </div>
+        <div id="loader" style="text-align:center;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>
         <div class="course-grid" id="courseGrid"></div>
     </div>
 
     <footer>
         <p>© <span id="year"></span> National Institute of Labour Studies</p>
-        <p>Developed by - <span class="developer">V.P.R.L. Vidanapathhirana</span></p>
+        <p>Developed by - V.P.R.L. Vidanapathirana</p>
     </footer>
 
     <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'si,ta,en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false }, 'google_translate_element');
-        }
+        function googleTranslateElementInit() { new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'si,ta,en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element'); }
     </script>
-    <script type="text/javascript"
-        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxlMiseZ5YjuzOFeNWSaJ5mqQ-EC5tWGIsFbRMGpTCBeGhiqZLLBJRI-Ch2ib6NjFEA/exec";
-
         let allData = [];
         let currentCat = 'All';
 
         document.getElementById('year').textContent = new Date().getFullYear();
 
         function fixImg(url) {
-            if (!url) return 'https://via.placeholder.com/600x600?text=No+Preview';
+            if (!url) return 'https://via.placeholder.com/600x600?text=No+Image';
             if (url.includes('drive.google.com')) {
-                let id = "";
-                if (url.includes('id=')) { id = url.split('id=')[1].split('&')[0]; }
-                else if (url.includes('/d/')) { id = url.split('/d/')[1].split('/')[0]; }
+                const id = url.split('id=')[1] || url.split('/d/')[1].split('/')[0];
                 return `https://lh3.googleusercontent.com/d/${id}=w1000`;
             }
             return url;
@@ -429,37 +268,38 @@
             try {
                 const r = await fetch(API_URL);
                 allData = await r.json();
-                updateCategoryNav();
+                updateNav();
                 applyFilters();
-            } catch (e) { document.getElementById('loader').innerText = "Failed to load courses."; }
+            } catch (e) { document.getElementById('loader').innerText = "Failed to load."; }
         }
 
-        function updateCategoryNav() {
+        function updateNav() {
             const nav = document.getElementById('categoryNav');
-            const categories = [...new Set(allData.map(item => item.Category))].filter(Boolean);
-            nav.innerHTML = `<div class="cat-pill active" onclick="setCat('All')">All Programs</div>`;
-            categories.forEach(cat => {
+            let cats = [];
+            allData.forEach(i => {
+                if (i.Category) {
+                    // කමාවෙන් වෙන් කරලා වෙන වෙනම කැටගරි ටික ගන්නවා
+                    const parts = i.Category.split(',').map(s => s.trim());
+                    cats.push(...parts);
+                }
+            });
+            const uniqueCats = [...new Set(cats)].filter(Boolean);
+            uniqueCats.forEach(c => {
                 const div = document.createElement('div');
                 div.className = 'cat-pill';
-                div.innerText = cat;
-                div.onclick = () => setCat(cat);
+                div.innerText = c;
+                div.onclick = () => setCat(c);
                 nav.appendChild(div);
             });
         }
 
         function applyFilters() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const today = new Date().setHours(0, 0, 0, 0);
-
-            const filtered = allData.filter(item => {
-                const matchSearch = (item.Name || "").toLowerCase().includes(query);
-                const matchCat = currentCat === 'All' || item.Category === currentCat;
-                let matchDate = true;
-                if (item.Date && item.Date.trim() !== "") {
-                    const d = new Date(item.Date.replace(/\./g, '-'));
-                    if (!isNaN(d)) matchDate = d >= today;
-                }
-                return matchSearch && matchCat && matchDate;
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allData.filter(i => {
+                const nameMatch = i.Name.toLowerCase().includes(q);
+                // කැටගරි එක ඇතුළේ "All" නෙමෙයි නම්, තෝරපු වචනය තියෙනවද බලනවා
+                const catMatch = currentCat === 'All' || (i.Category && i.Category.includes(currentCat));
+                return nameMatch && catMatch;
             });
             render(filtered);
         }
@@ -468,80 +308,41 @@
             document.getElementById('loader').style.display = 'none';
             const grid = document.getElementById('courseGrid');
             grid.innerHTML = data.map(item => {
-                const shortDesc = item.Description ? (item.Description.length > 90 ? item.Description.substring(0, 90) + "..." : item.Description) : "";
-                const hasMore = item.Description && item.Description.length > 90;
+                // කැටගරි බජ් දෙකක් හදන විදිහ
+                const catParts = item.Category ? item.Category.split(',').map(s => s.trim()) : [];
+                let badgeHTML = `<span class="badge">${catParts[0] || ''}</span>`;
+                if (catParts[1]) badgeHTML += `<span class="badge badge-tag">${catParts[1]}</span>`;
 
-                // --- Price Logic ---
-                let priceDisplay = "";
-                const pValue = String(item.Price).trim();
-                if (pValue.toLowerCase() === "free") {
-                    priceDisplay = "FREE";
-                } else {
-                    priceDisplay = "LKR " + Number(item.Price).toLocaleString();
-                }
-
+                const priceDisp = String(item.Price).toLowerCase() === 'free' ? 'FREE' : 'LKR ' + Number(item.Price).toLocaleString();
                 const imgSrc = fixImg(item.Image_URL);
 
                 return `
-            <div class="card">
-                <div class="card-img-container" onclick="openImg('${imgSrc}')">
-                    <span class="badge">${item.Category}</span>
-                    <img src="${imgSrc}" class="card-img" alt="Course" loading="lazy" onerror="this.src='https://via.placeholder.com/600x600?text=No+Image'">
-                </div>
-                <div class="card-body">
-                    <h3>${item.Name}</h3>
-                    <p class="card-desc">${shortDesc}</p>
-                    ${hasMore ? `<span class="read-more-btn" onclick="openDesc('${item.Name.replace(/'/g, "\\'")}', '${item.Description.replace(/\n/g, '<br>').replace(/'/g, "\\'")}')">Read More</span>` : ""}
-                    
-                    <div class="info-group">
-                        <div class="info-row"><i class="fa-regular fa-calendar"></i> ${item.Date || 'TBA'}</div>
-                        <div class="info-row"><i class="fa-regular fa-clock"></i> ${item.Time || 'TBA'}</div>
-                        <div class="info-row"><i class="fa-solid fa-location-dot"></i> ${item.Location || 'NILS'}</div>
+                <div class="card">
+                    <div class="card-img-container" onclick="openImg('${imgSrc}')">
+                        ${badgeHTML}
+                        <img src="${imgSrc}" class="card-img" loading="lazy">
                     </div>
-
-                    <div class="price-row">
-                        <div class="price-tag">${priceDisplay}</div>
-                        ${item.Installments === "Yes" ? '<div style="color:#16a34a; font-size:11px; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Installments Available</div>' : ''}
+                    <div class="card-body">
+                        <h3>${item.Name}</h3>
+                        <p style="font-size:0.85rem; color:#64748b;">${item.Description ? item.Description.substring(0, 80) + '...' : ''}</p>
+                        <div class="info-group" style="margin-top:10px; font-size:0.8rem;">
+                            <div><i class="fa-regular fa-calendar"></i> ${item.Date || 'TBA'}</div>
+                            <div><i class="fa-solid fa-location-dot"></i> ${item.Location || 'NILS'}</div>
+                        </div>
+                        <div class="price-tag">${priceDisp}</div>
+                        <a href="${item.Apply_Link || '#'}" target="_blank" class="apply-btn" style="background:var(--nils-blue); color:white; text-align:center; padding:12px; border-radius:12px; text-decoration:none; margin-top:15px; font-weight:600;">Register Now</a>
                     </div>
-                    <a href="${item.Apply_Link || '#'}" target="_blank" class="apply-btn">Register Online</a>
-                </div>
-            </div>`;
+                </div>`;
             }).join('');
         }
 
         function setCat(c) {
             currentCat = c;
-            document.querySelectorAll('.cat-pill').forEach(p => {
-                p.classList.toggle('active', p.innerText === c || (c === 'All' && p.innerText === 'All Programs'));
-            });
+            document.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.innerText === c));
             applyFilters();
         }
 
-        // Description Modal Logic
-        function openDesc(title, desc) {
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('mDesc').innerHTML = desc;
-            document.getElementById('modalOverlay').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeDesc() {
-            document.getElementById('modalOverlay').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Image Viewer Logic
-        function openImg(src) {
-            document.getElementById('fullImg').src = src;
-            document.getElementById('imgModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeImg() {
-            document.getElementById('imgModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
+        function openImg(src) { document.getElementById('fullImg').src = src; document.getElementById('imgModal').style.display = 'flex'; }
         load();
     </script>
 </body>
