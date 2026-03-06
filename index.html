@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NILS Online Registration Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --nils-blue: #003366;
+            --nils-gold: #ffcc00;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            top: 0 !important;
+            /* Google translate fix */
+        }
+
+        /* Language Translator Bar */
+        .top-bar {
+            background: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header {
+            background: linear-gradient(-45deg, #003366, #00509d, #001a33, #003366);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            padding: 4rem 1rem 5rem;
+            text-align: center;
+            border-bottom: 6px solid var(--nils-gold);
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            margin-top: 10px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+            padding: 0 20px 60px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .controls-section {
+            max-width: 900px;
+            margin: -40px auto 50px;
+            background: white;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--nils-blue);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+            background: #f8fafc;
+            transition: 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: var(--nils-blue);
+            background: #fff;
+        }
+
+        .category-nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cat-pill {
+            padding: 10px 22px;
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .cat-pill.active {
+            background: var(--nils-blue);
+            color: white;
+            border-color: var(--nils-blue);
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-img-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+            background: #eee;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 51, 102, 0.85);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+        }
+
+        .card-body {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--nils-blue);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .read-more-btn {
+            color: var(--nils-blue);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: underline;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .info-group {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .info-row {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #334155;
+        }
+
+        .info-row i {
+            color: var(--nils-blue);
+            width: 16px;
+            opacity: 0.7;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .price-tag {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ea580c;
+        }
+
+        .apply-btn {
+            background: var(--nils-blue);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .apply-btn:hover {
+            background: #002244;
+        }
+
+        /* Modal Popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 28px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: modalSlide 0.4s ease-out;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: sticky;
+            top: -20px;
+            float: right;
+            cursor: pointer;
+            color: #64748b;
+            background: white;
+            padding: 5px;
+            border-radius: 50%;
+            z-index: 10;
+            font-size: 24px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--nils-blue);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 5px solid var(--nils-gold);
+        }
+
+        footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+
+        .developer {
+            font-weight: 500;
+            color: var(--nils-gold);
+        }
+
+        /* Google Translate Hiding Frame */
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        .goog-te-gadget-simple {
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            padding: 6px !important;
+            font-family: 'Poppins' !important;
+        }
+
+        @media (max-width: 1100px) {
+            .course-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .top-bar {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <span style="margin-right: 10px; font-size: 0.8rem; color: #64748b; font-weight: 500;">Select Language: </span>
+        <div id="google_translate_element"></div>
+    </div>
+
+    <header>
+        <h1>NILS Online Registration</h1>
+        <p>National Institute of Labour Studies - Sri Lanka</p>
+    </header>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeDesc()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeDesc()"><i class="fa-solid fa-circle-xmark"></i></span>
+            <h2 class="modal-title" id="mTitle">Course Name</h2>
+            <div class="modal-desc" id="mDesc">Description goes here...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls-section">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="search-box" placeholder="Search for a course..."
+                    onkeyup="applyFilters()">
+            </div>
+            <div class="category-nav" id="categoryNav">
+                <div class="cat-pill active" onclick="setCat('All')">All Programs</div>
+            </div>
+        </div>
+
+        <div id="loader" style="text-align:center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+        </div>
+        <div class="course-grid" id="courseGrid"></div>
+    </div>
+
+    <footer>
+        <p>© <span id="year"></span> National Institute of Labour Studies</p>
+        <p>Developed by - <span class="developer">V.P.R.L. Vidanapathhirana</span></p>
+    </footer>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'si,ta,en',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxlMiseZ5YjuzOFeNWSaJ5mqQ-EC5tWGIsFbRMGpTCBeGhiqZLLBJRI-Ch2ib6NjFEA/exec";
+
+        let allData = [];
+        let currentCat = 'All';
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Optimized Image Loading (Lazy + Google Drive Quality Control)
+        function fixImg(url) {
+            if (!url) return 'https://via.placeholder.com/600x600?text=No+Preview';
+            if (url.includes('drive.google.com')) {
+                let id = "";
+                if (url.includes('id=')) { id = url.split('id=')[1].split('&')[0]; }
+                else if (url.includes('/d/')) { id = url.split('/d/')[1].split('/')[0]; }
+                // Changed to =w400 for better performance (Smaller quality but looks good on cards)
+                return `https://lh3.googleusercontent.com/d/${id}=w400`;
+            }
+            return url;
+        }
+
+        async function load() {
+            try {
+                const r = await fetch(API_URL);
+                allData = await r.json();
+                updateCategoryNav();
+                applyFilters();
+            } catch (e) { document.getElementById('loader').innerText = "Failed to load courses."; }
+        }
+
+        function updateCategoryNav() {
+            const nav = document.getElementById('categoryNav');
+            const categories = [...new Set(allData.map(item => item.Category))].filter(Boolean);
+            nav.innerHTML = `<div class="cat-pill active" onclick="setCat('All')">All Programs</div>`;
+            categories.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = 'cat-pill';
+                div.innerText = cat;
+                div.onclick = () => setCat(cat);
+                nav.appendChild(div);
+            });
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const today = new Date().setHours(0, 0, 0, 0);
+
+            const filtered = allData.filter(item => {
+                const matchSearch = (item.Name || "").toLowerCase().includes(query);
+                const matchCat = currentCat === 'All' || item.Category === currentCat;
+                let matchDate = true;
+                if (item.Date && item.Date.trim() !== "") {
+                    const d = new Date(item.Date.replace(/\./g, '-'));
+                    if (!isNaN(d)) matchDate = d >= today;
+                }
+                return matchSearch && matchCat && matchDate;
+            });
+            render(filtered);
+        }
+
+        function render(data) {
+            document.getElementById('loader').style.display = 'none';
+            const grid = document.getElementById('courseGrid');
+            grid.innerHTML = data.map(item => {
+                const shortDesc = item.Description ? (item.Description.length > 90 ? item.Description.substring(0, 90) + "..." : item.Description) : "";
+                const hasMore = item.Description && item.Description.length > 90;
+
+                return `
+            <div class="card">
+                <div class="card-img-container">
+                    <span class="badge">${item.Category}</span>
+                    <img src="${fixImg(item.Image_URL)}" 
+                         class="card-img" 
+                         alt="Course" 
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/600x600?text=No+Image'">
+                </div>
+                <div class="card-body">
+                    <h3>${item.Name}</h3>
+                    <p class="card-desc">${shortDesc}</p>
+                    ${hasMore ? `<span class="read-more-btn" onclick="openDesc('${item.Name.replace(/'/g, "\\'")}', '${item.Description.replace(/\n/g, '<br>').replace(/'/g, "\\'")}')">Read More</span>` : ""}
+                    
+                    <div class="info-group">
+                        <div class="info-row"><i class="fa-regular fa-calendar"></i> ${item.Date || 'TBA'}</div>
+                        <div class="info-row"><i class="fa-regular fa-clock"></i> ${item.Time || 'TBA'}</div>
+                        <div class="info-row"><i class="fa-solid fa-location-dot"></i> ${item.Location || 'NILS'}</div>
+                    </div>
+
+                    <div class="price-row">
+                        <div class="price-tag">LKR ${Number(item.Price).toLocaleString()}</div>
+                        ${item.Installments === "Yes" ? '<div style="color:#16a34a; font-size:11px; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Installments Available</div>' : ''}
+                    </div>
+                    <a href="${item.Apply_Link || '#'}" target="_blank" class="apply-btn">Register Online</a>
+                </div>
+            </div>`;
+            }).join('');
+        }
+
+        function setCat(c) {
+            currentCat = c;
+            document.querySelectorAll('.cat-pill').forEach(p => {
+                p.classList.toggle('active', p.innerText === c || (c === 'All' && p.innerText === 'All Programs'));
+            });
+            applyFilters();
+        }
+
+        function openDesc(title, desc) {
+            document.getElementById('mTitle').innerText = title;
+            document.getElementById('mDesc').innerHTML = desc;
+            document.getElementById('modalOverlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDesc() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        load();
+    </script>
+</body>
+
+</html>
