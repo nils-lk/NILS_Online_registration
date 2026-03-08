@@ -30,6 +30,7 @@
             background-color: var(--bg);
             color: var(--text-main);
             overflow-x: hidden;
+            top: 0 !important;
         }
 
         .top-bar {
@@ -129,17 +130,23 @@
         }
 
         .card:hover {
-            transform: translateY(-12px);
+            transform: translateY(-8px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
         }
 
         .card-img-container {
             width: 100%;
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
             position: relative;
             background: #eee;
             cursor: zoom-in;
+            overflow: hidden;
+        }
+
+        .card-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
         }
 
         .badge {
@@ -161,8 +168,6 @@
             background: #ea580c;
         }
 
-        /* දෙවැනි badge එක සඳහා */
-
         .card-body {
             padding: 25px;
             flex-grow: 1;
@@ -170,34 +175,129 @@
             flex-direction: column;
         }
 
-        .price-tag {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #ea580c;
-            margin-top: 15px;
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--nils-blue);
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
 
-        /* Image Modal */
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .read-more-link {
+            color: var(--nils-blue);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .info-group {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            color: var(--text-sub);
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ea580c;
+            margin: 15px 0;
+        }
+
+        .apply-btn {
+            background: var(--nils-blue);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 4000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            border-radius: 24px;
+            padding: 35px;
+            position: relative;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-modal {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            color: var(--text-sub);
+        }
+
         .img-modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 3000;
+            z-index: 5000;
+            padding: 10px;
         }
 
         .close-btn {
             position: absolute;
             top: 20px;
-            right: 30px;
+            right: 25px;
             color: white;
-            font-size: 40px;
+            font-size: 45px;
             cursor: pointer;
+            z-index: 5100;
+            font-weight: bold;
+        }
+
+        .img-zoom-content {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            object-fit: contain;
         }
 
         footer {
@@ -207,6 +307,30 @@
             text-align: center;
             margin-top: 50px;
             border-top: 5px solid var(--nils-gold);
+        }
+
+        @media (max-width: 600px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .img-modal-overlay {
+                padding: 5px;
+            }
+
+            .close-btn {
+                top: 15px;
+                right: 20px;
+                font-size: 40px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
         }
     </style>
 </head>
@@ -221,9 +345,19 @@
         <p>National Institute of Labour Studies - Sri Lanka</p>
     </header>
 
-    <div class="img-modal-overlay" id="imgModal" onclick="this.style.display='none'"><span
-            class="close-btn">&times;</span><img id="fullImg"
-            style="max-width:90%; max-height:85vh; border-radius:10px;"></div>
+    <div class="modal-overlay" id="descModal" onclick="closeModal('descModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeModal('descModal')"><i class="fa-solid fa-circle-xmark"></i></span>
+            <h2 id="modalTitle" style="color:var(--nils-blue); margin-bottom:15px; font-size:1.5rem;">Course Title</h2>
+            <div id="modalBody" style="line-height:1.7; color:var(--text-sub); white-space: pre-line;">Full
+                description...</div>
+        </div>
+    </div>
+
+    <div class="img-modal-overlay" id="imgModal" onclick="closeModal('imgModal')">
+        <span class="close-btn">×</span>
+        <img id="fullImg" class="img-zoom-content">
+    </div>
 
     <div class="container">
         <div class="controls-section">
@@ -244,7 +378,9 @@
     </footer>
 
     <script type="text/javascript">
-        function googleTranslateElementInit() { new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'si,ta,en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element'); }
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'si,ta,en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
+        }
     </script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
@@ -259,7 +395,7 @@
             if (!url) return 'https://via.placeholder.com/600x600?text=No+Image';
             if (url.includes('drive.google.com')) {
                 const id = url.split('id=')[1] || url.split('/d/')[1].split('/')[0];
-                return `https://lh3.googleusercontent.com/d/${id}=w1000`;
+                return `https://lh3.googleusercontent.com/u/0/d/${id}`;
             }
             return url;
         }
@@ -278,7 +414,6 @@
             let cats = [];
             allData.forEach(i => {
                 if (i.Category) {
-                    // කමාවෙන් වෙන් කරලා වෙන වෙනම කැටගරි ටික ගන්නවා
                     const parts = i.Category.split(',').map(s => s.trim());
                     cats.push(...parts);
                 }
@@ -297,7 +432,6 @@
             const q = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allData.filter(i => {
                 const nameMatch = i.Name.toLowerCase().includes(q);
-                // කැටගරි එක ඇතුළේ "All" නෙමෙයි නම්, තෝරපු වචනය තියෙනවද බලනවා
                 const catMatch = currentCat === 'All' || (i.Category && i.Category.includes(currentCat));
                 return nameMatch && catMatch;
             });
@@ -308,10 +442,13 @@
             document.getElementById('loader').style.display = 'none';
             const grid = document.getElementById('courseGrid');
             grid.innerHTML = data.map(item => {
-                // කැටගරි බජ් දෙකක් හදන විදිහ
                 const catParts = item.Category ? item.Category.split(',').map(s => s.trim()) : [];
                 let badgeHTML = `<span class="badge">${catParts[0] || ''}</span>`;
                 if (catParts[1]) badgeHTML += `<span class="badge badge-tag">${catParts[1]}</span>`;
+
+                const rawDesc = item.Description || "";
+                const isLong = rawDesc.length > 100;
+                const shortDesc = isLong ? rawDesc.substring(0, 100) + "..." : rawDesc;
 
                 const priceDisp = String(item.Price).toLowerCase() === 'free' ? 'FREE' : 'LKR ' + Number(item.Price).toLocaleString();
                 const imgSrc = fixImg(item.Image_URL);
@@ -320,17 +457,19 @@
                 <div class="card">
                     <div class="card-img-container" onclick="openImg('${imgSrc}')">
                         ${badgeHTML}
-                        <img src="${imgSrc}" class="card-img" loading="lazy">
+                        <img src="${imgSrc}" class="card-img" loading="lazy" onerror="this.src='https://via.placeholder.com/600x600?text=No+Image'">
                     </div>
                     <div class="card-body">
                         <h3>${item.Name}</h3>
-                        <p style="font-size:0.85rem; color:#64748b;">${item.Description ? item.Description.substring(0, 80) + '...' : ''}</p>
-                        <div class="info-group" style="margin-top:10px; font-size:0.8rem;">
-                            <div><i class="fa-regular fa-calendar"></i> ${item.Date || 'TBA'}</div>
-                            <div><i class="fa-solid fa-location-dot"></i> ${item.Location || 'NILS'}</div>
+                        <p class="card-desc">${shortDesc}</p>
+                        ${isLong ? `<span class="read-more-link" onclick="openDesc('${item.Name.replace(/'/g, "\\'")}', '${rawDesc.replace(/\n/g, '<br>').replace(/'/g, "\\'")}')">Read More</span>` : ""}
+                        
+                        <div class="info-group">
+                            <div class="info-row"><i class="fa-regular fa-calendar"></i> ${item.Date || 'TBA'}</div>
+                            <div class="info-row"><i class="fa-solid fa-location-dot"></i> ${item.Location || 'NILS'}</div>
                         </div>
                         <div class="price-tag">${priceDisp}</div>
-                        <a href="${item.Apply_Link || '#'}" target="_blank" class="apply-btn" style="background:var(--nils-blue); color:white; text-align:center; padding:12px; border-radius:12px; text-decoration:none; margin-top:15px; font-weight:600;">Register Now</a>
+                        <a href="${item.Apply_Link || '#'}" target="_blank" class="apply-btn">Register Now</a>
                     </div>
                 </div>`;
             }).join('');
@@ -342,7 +481,24 @@
             applyFilters();
         }
 
-        function openImg(src) { document.getElementById('fullImg').src = src; document.getElementById('imgModal').style.display = 'flex'; }
+        function openDesc(title, desc) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = desc;
+            document.getElementById('descModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openImg(src) {
+            document.getElementById('fullImg').src = src;
+            document.getElementById('imgModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
         load();
     </script>
 </body>
