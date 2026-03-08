@@ -268,6 +268,7 @@
             color: var(--text-sub);
         }
 
+        /* FIXED IMAGE MODAL FOR MOBILE */
         .img-modal-overlay {
             position: fixed;
             top: 0;
@@ -276,6 +277,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.95);
             display: none;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 5000;
@@ -284,20 +286,22 @@
 
         .close-btn {
             position: absolute;
-            top: 20px;
-            right: 25px;
+            top: 30px;
+            right: 30px;
             color: white;
             font-size: 45px;
             cursor: pointer;
             z-index: 5100;
             font-weight: bold;
+            line-height: 1;
         }
 
         .img-zoom-content {
-            max-width: 100%;
-            max-height: 90vh;
+            max-width: 95%;
+            max-height: 80vh;
             border-radius: 8px;
             object-fit: contain;
+            margin-top: 20px;
         }
 
         footer {
@@ -323,9 +327,9 @@
             }
 
             .close-btn {
-                top: 15px;
+                top: 20px;
                 right: 20px;
-                font-size: 40px;
+                font-size: 45px;
             }
 
             .modal-content {
@@ -361,8 +365,8 @@
 
     <div class="container">
         <div class="controls-section">
-            <input type="text" id="searchInput" class="search-box" placeholder="Search for a course..."
-                onkeyup="applyFilters()"
+            <input type="text" id="searchInput" class="search-box"
+                placeholder="Search for a course or date (e.g. 2026.03)..." onkeyup="applyFilters()"
                 style="width:100%; padding:15px; border-radius:14px; border:1px solid #e2e8f0; outline:none;">
             <div class="category-nav" id="categoryNav">
                 <div class="cat-pill active" id="pill-all" onclick="setCat('All')">All Programs</div>
@@ -430,10 +434,26 @@
 
         function applyFilters() {
             const q = document.getElementById('searchInput').value.toLowerCase();
+
+            const today = new Date();
+            const todayStr = today.getFullYear() + '.' +
+                String(today.getMonth() + 1).padStart(2, '0') + '.' +
+                String(today.getDate()).padStart(2, '0');
+
             const filtered = allData.filter(i => {
+                // Modified logic to check both Name and Date for the search input
                 const nameMatch = i.Name.toLowerCase().includes(q);
+                const searchDateMatch = i.Date && i.Date.toLowerCase().includes(q);
+
                 const catMatch = currentCat === 'All' || (i.Category && i.Category.includes(currentCat));
-                return nameMatch && catMatch;
+
+                // Keep the "Hide Past Posts" logic
+                let isPastPostFilter = true;
+                if (i.Date && i.Date !== 'TBA' && i.Date.match(/^\d{4}\.\d{2}\.\d{2}$/)) {
+                    isPastPostFilter = i.Date >= todayStr;
+                }
+
+                return (nameMatch || searchDateMatch) && catMatch && isPastPostFilter;
             });
             render(filtered);
         }
@@ -478,7 +498,6 @@
         function setCat(c) {
             currentCat = c;
             document.querySelectorAll('.cat-pill').forEach(p => {
-                // "All Programs" kalla check karanna hariyata
                 if (c === 'All') {
                     p.classList.toggle('active', p.innerText === 'All Programs');
                 } else {
@@ -499,6 +518,7 @@
             document.getElementById('fullImg').src = src;
             document.getElementById('imgModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            document.getElementById('imgModal').scrollTop = 0;
         }
 
         function closeModal(id) {
