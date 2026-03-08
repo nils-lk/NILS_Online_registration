@@ -233,7 +233,6 @@
             transition: 0.3s;
         }
 
-        /* MODALS CSS FIXED FOR DESKTOP & MOBILE iFRAME VIEW */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -315,7 +314,6 @@
             border-top: 5px solid var(--nils-gold);
         }
 
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
             .course-grid {
                 grid-template-columns: 1fr;
@@ -389,8 +387,10 @@
         <p>© <span id="year"></span> National Institute of Labour Studies</p>
         <p>Developed by - V.P.R.L. Vidanapathirana</p>
 
-        <div style="margin-top: 20px; opacity: 0.8;">
-            <a href='https://www.counters-free.net/' style="display:none;">counter-FREE</a>
+        <div style="margin-top: 15px;">
+            <a href='https://www.counters-free.net/'
+                style="color: white; text-decoration: none; font-size: 10px; opacity: 0.7;">counter-FREE</a>
+            <br>
             <script type='text/javascript'
                 src='https://www.freevisitorcounters.com/auth.php?id=221ab83fc2a6c6e94c9fc1d96dc2c026eee5a3ae'></script>
             <script type="text/javascript"
@@ -457,7 +457,7 @@
                 String(today.getDate()).padStart(2, '0');
 
             const filtered = allData.filter(i => {
-                const nameMatch = i.Name.toLowerCase().includes(q);
+                const nameMatch = i.Name && i.Name.toLowerCase().includes(q);
                 const searchDateMatch = i.Date && i.Date.toLowerCase().includes(q);
                 const catMatch = currentCat === 'All' || (i.Category && i.Category.includes(currentCat));
 
@@ -484,6 +484,9 @@
                 const priceDisp = String(item.Price).toLowerCase() === 'free' ? 'FREE' : 'LKR ' + Number(item.Price).toLocaleString();
                 const imgSrc = fixImg(item.Image_URL);
 
+                const encodedTitle = btoa(unescape(encodeURIComponent(item.Name || "")));
+                const encodedDesc = btoa(unescape(encodeURIComponent(rawDesc)));
+
                 return `
                 <div class="card">
                     <div class="card-img-container" onclick="openImg('${imgSrc}')">
@@ -491,9 +494,9 @@
                         <img src="${imgSrc}" class="card-img" loading="lazy" onerror="this.src='https://via.placeholder.com/600x600?text=No+Image'">
                     </div>
                     <div class="card-body">
-                        <h3>${item.Name}</h3>
-                        <p class="card-desc">${shortDesc}</p>
-                        ${isLong ? `<span class="read-more-link" onclick="openDesc('${item.Name.replace(/'/g, "\\'")}', '${rawDesc.replace(/\n/g, '<br>').replace(/'/g, "\\")}')">Read More</span>` : ""}
+                        <h3>${item.Name || ""}</h3>
+                        <div class="card-desc">${shortDesc}</div>
+                        ${isLong ? `<span class="read-more-link" onclick="openDescEncoded('${encodedTitle}', '${encodedDesc}')">Read More</span>` : ""}
                         <div class="info-group">
                             <div class="info-row"><i class="fa-regular fa-calendar"></i> ${item.Date || 'TBA'}</div>
                             <div class="info-row"><i class="fa-solid fa-location-dot"></i> ${item.Location || 'NILS'}</div>
@@ -514,12 +517,16 @@
             applyFilters();
         }
 
-        function openDesc(title, desc) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalBody').innerHTML = desc;
-            document.getElementById('descModal').style.display = 'flex';
-            document.getElementById('descModal').scrollTop = 0;
-            document.body.style.overflow = 'hidden';
+        function openDescEncoded(encTitle, encDesc) {
+            try {
+                const title = decodeURIComponent(escape(atob(encTitle)));
+                const desc = decodeURIComponent(escape(atob(encDesc))).replace(/\n/g, '<br>');
+                document.getElementById('modalTitle').innerText = title;
+                document.getElementById('modalBody').innerHTML = desc;
+                document.getElementById('descModal').style.display = 'flex';
+                document.getElementById('descModal').scrollTop = 0;
+                document.body.style.overflow = 'hidden';
+            } catch (e) { console.error("Error opening modal", e); }
         }
 
         function openImg(src) {
