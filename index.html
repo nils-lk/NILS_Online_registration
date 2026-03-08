@@ -342,7 +342,7 @@
 
     <header>
         <h1>NILS Online Registration</h1>
-        <p>National Institute of Labour Studies - Sri Lanka</p>
+        <p>National Institute of Labour Studies</p>
     </header>
 
     <div class="modal-overlay" id="descModal" onclick="closeModal('descModal')">
@@ -365,7 +365,7 @@
                 onkeyup="applyFilters()"
                 style="width:100%; padding:15px; border-radius:14px; border:1px solid #e2e8f0; outline:none;">
             <div class="category-nav" id="categoryNav">
-                <div class="cat-pill active" onclick="setCat('All')">All Programs</div>
+                <div class="cat-pill active" id="pill-all" onclick="setCat('All')">All Programs</div>
             </div>
         </div>
         <div id="loader" style="text-align:center;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>
@@ -477,7 +477,14 @@
 
         function setCat(c) {
             currentCat = c;
-            document.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.innerText === c));
+            document.querySelectorAll('.cat-pill').forEach(p => {
+                // "All Programs" kalla check karanna hariyata
+                if (c === 'All') {
+                    p.classList.toggle('active', p.innerText === 'All Programs');
+                } else {
+                    p.classList.toggle('active', p.innerText === c);
+                }
+            });
             applyFilters();
         }
 
