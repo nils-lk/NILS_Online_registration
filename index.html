@@ -412,6 +412,7 @@
 
         document.getElementById('year').textContent = new Date().getFullYear();
 
+        // Kept exactly as in your original file
         function fixImg(url) {
             if (!url) return 'https://via.placeholder.com/600x600?text=No+Image';
             if (url.includes('drive.google.com')) {
@@ -467,6 +468,7 @@
                 }
                 return (nameMatch || searchDateMatch) && catMatch && isPastPostFilter;
             });
+
             render(filtered);
         }
 
@@ -543,6 +545,9 @@
 
         load();
     </script>
+
+    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cme4jgxxz000y106i3p2z8u8i'></zapier-interfaces-chatbot-embed>
 </body>
 
 </html>
