@@ -87,6 +87,13 @@
             text-align: center;
         }
 
+        /* Added for the new search and month filter layout */
+        .search-flex {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+
         .category-nav {
             display: flex;
             gap: 12px;
@@ -322,6 +329,11 @@
             header h1 {
                 font-size: 1.8rem;
             }
+            
+            /* Responsive for the new search block */
+            .search-flex {
+                flex-direction: column;
+            }
 
             .modal-content {
                 padding: 25px;
@@ -372,9 +384,16 @@
 
     <div class="container">
         <div class="controls-section">
-            <input type="text" id="searchInput" class="search-box"
-                placeholder="Search for a course or date (e.g. 2026.03)..." onkeyup="applyFilters()"
-                style="width:100%; padding:15px; border-radius:14px; border:1px solid #e2e8f0; outline:none;">
+            
+            <div class="search-flex">
+                <input type="text" id="searchInput" class="search-box"
+                    placeholder="Search for a course or date (e.g. 2026.03)..." onkeyup="applyFilters()"
+                    style="flex: 1; padding:15px; border-radius:14px; border:1px solid #e2e8f0; outline:none;">
+                
+                <input type="month" id="monthFilter" class="search-box" onchange="applyFilters()" title="Filter by Month"
+                    style="padding:15px; border-radius:14px; border:1px solid #e2e8f0; outline:none; cursor:pointer; color: var(--text-sub); font-family: 'Poppins', sans-serif;">
+            </div>
+
             <div class="category-nav" id="categoryNav">
                 <div class="cat-pill active" id="pill-all" onclick="setCat('All')">All Programs</div>
             </div>
@@ -452,6 +471,9 @@
 
         function applyFilters() {
             const q = document.getElementById('searchInput').value.toLowerCase();
+            const m = document.getElementById('monthFilter').value; 
+            const filterMonth = m ? m.replace('-', '.') : ''; 
+
             const today = new Date();
             const todayStr = today.getFullYear() + '.' +
                 String(today.getMonth() + 1).padStart(2, '0') + '.' +
@@ -461,12 +483,23 @@
                 const nameMatch = i.Name && i.Name.toLowerCase().includes(q);
                 const searchDateMatch = i.Date && i.Date.toLowerCase().includes(q);
                 const catMatch = currentCat === 'All' || (i.Category && i.Category.includes(currentCat));
+                
+                const monthMatch = filterMonth === '' || (i.Date && i.Date.startsWith(filterMonth));
 
                 let isPastPostFilter = true;
                 if (i.Date && i.Date !== 'TBA' && i.Date.match(/^\d{4}\.\d{2}\.\d{2}$/)) {
                     isPastPostFilter = i.Date >= todayStr;
                 }
-                return (nameMatch || searchDateMatch) && catMatch && isPastPostFilter;
+                return (nameMatch || searchDateMatch) && catMatch && isPastPostFilter && monthMatch;
+            });
+
+            // Sorting: Upcoming dates first, 'TBA' goes to the bottom
+            filtered.sort((a, b) => {
+                const dateA = a.Date || 'TBA';
+                const dateB = b.Date || 'TBA';
+                if (dateA === 'TBA') return 1;
+                if (dateB === 'TBA') return -1;
+                return dateA.localeCompare(dateB);
             });
 
             render(filtered);
