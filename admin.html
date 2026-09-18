@@ -159,6 +159,158 @@
             50%      { box-shadow: 0 0 0 5px rgba(16,185,129,0); }
         }
 
+        /* ── DB HEALTH MONITOR ────────────────────────────────── */
+        .db-monitor-row {
+            position: relative; z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 14px;
+            padding: 12px 28px;
+            background: rgba(13, 17, 23, 0.4);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+
+        @media (max-width: 950px) {
+            .db-monitor-row { grid-template-columns: 1fr; gap: 10px; padding: 12px 16px; }
+        }
+
+        .db-health-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: var(--tr);
+        }
+
+        .db-health-card:hover {
+            border-color: var(--border-h);
+        }
+
+        .db-meta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-meta-icon {
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.95rem; flex-shrink: 0;
+        }
+
+        .icon-gs { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .icon-redis { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+        .db-meta-text .db-title {
+            font-size: 0.82rem; font-weight: 700; color: var(--t1);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .db-meta-text .db-desc {
+            font-size: 0.68rem; color: var(--t2); margin-top: 1px;
+        }
+
+        .db-meta-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .health-status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 11px; border-radius: 50px;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .status-online {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-loading {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .latency-pill {
+            font-size: 0.68rem;
+            color: var(--t2);
+            font-family: monospace;
+            background: var(--bg-base);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .db-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sync-now {
+            background: linear-gradient(135deg, var(--blue), var(--indigo));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: var(--tr);
+            white-space: nowrap;
+        }
+
+        .btn-sync-now:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+
+        .btn-sync-now:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-flush-now {
+            background: rgba(244, 63, 94, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(244, 63, 94, 0.25);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--tr);
+            white-space: nowrap;
+        }
+
+        .btn-flush-now:hover {
+            background: rgba(244, 63, 94, 0.2);
+            transform: translateY(-1px);
+        }
+
         /* ── STATS ───────────────────────────────────────────── */
         .stats-row {
             position: relative; z-index: 1;
@@ -1130,6 +1282,53 @@
         </div>
     </header>
 
+    <!-- ══ DB & CACHE HEALTH MONITOR ══════════════════ -->
+    <div class="db-monitor-row">
+        <!-- Google Sheets Card -->
+        <div class="db-health-card">
+            <div class="db-meta-left">
+                <div class="db-meta-icon icon-gs"><i class="fas fa-database"></i></div>
+                <div class="db-meta-text">
+                    <div class="db-title">Google Sheets <span style="font-size:0.65rem;opacity:0.75;font-weight:normal;">(Master DB)</span></div>
+                    <div class="db-desc" id="gsDesc">Checking status...</div>
+                </div>
+            </div>
+            <div class="db-meta-right">
+                <span class="latency-pill" id="gsLatency"><i class="fas fa-bolt"></i> –</span>
+                <div class="health-status-badge status-loading" id="gsStatus">
+                    <i class="fas fa-spinner fa-spin"></i> Checking
+                </div>
+            </div>
+        </div>
+
+        <!-- Upstash Redis Card -->
+        <div class="db-health-card">
+            <div class="db-meta-left">
+                <div class="db-meta-icon icon-redis"><i class="fas fa-bolt-lightning"></i></div>
+                <div class="db-meta-text">
+                    <div class="db-title">Upstash Redis <span style="font-size:0.65rem;opacity:0.75;font-weight:normal;">(Cloud Cache)</span></div>
+                    <div class="db-desc" id="redisDesc">Checking cache...</div>
+                </div>
+            </div>
+            <div class="db-meta-right">
+                <span class="latency-pill" id="redisLatency"><i class="fas fa-bolt"></i> –</span>
+                <div class="health-status-badge status-loading" id="redisStatus">
+                    <i class="fas fa-spinner fa-spin"></i> Checking
+                </div>
+            </div>
+        </div>
+
+        <!-- Sync Actions -->
+        <div class="db-actions-group">
+            <button class="btn-sync-now" id="btnSyncDBs" onclick="triggerManualSync()" title="Force fetch from Google Sheets and warm Upstash Cache">
+                <i class="fas fa-sync-alt" id="syncIcon"></i> Force Sync All
+            </button>
+            <button class="btn-flush-now" onclick="triggerFlushCache()" title="Clear cache">
+                <i class="fas fa-trash-alt"></i> Clear Cache
+            </button>
+        </div>
+    </div>
+
     <!-- ══ STATS ══════════════════════════════════════ -->
     <div class="stats-row">
         <div class="stat-card s-blue">
@@ -1494,6 +1693,7 @@
                 renderTable(allData);
                 updateStats(allData);
                 buildFilterCounts(allData);
+                checkDBHealth();
             } catch (err) {
                 console.error("Admin load error:", err);
                 document.getElementById('tableBody').innerHTML = `
@@ -1744,9 +1944,102 @@
             }
         }
 
+        /* ── DB Health Monitoring & Sync Controls ─────────────────── */
+        async function checkDBHealth() {
+            if (!window.NILSCacheService) return;
+            const gsStatus    = document.getElementById('gsStatus');
+            const gsLatency   = document.getElementById('gsLatency');
+            const gsDesc      = document.getElementById('gsDesc');
+            const redisStatus = document.getElementById('redisStatus');
+            const redisLatency= document.getElementById('redisLatency');
+            const redisDesc   = document.getElementById('redisDesc');
+
+            try {
+                const report = await NILSCacheService.checkStatus(API_URL, allData);
+
+                // Update Google Sheets Card
+                if (report.googleSheets.online) {
+                    gsStatus.className = 'health-status-badge status-online';
+                    gsStatus.innerHTML = '<i class="fas fa-check-circle"></i> Online';
+                    gsDesc.innerText   = `${report.googleSheets.count} programmes in Master DB`;
+                    gsLatency.innerHTML = `<i class="fas fa-stopwatch"></i> ${report.googleSheets.latencyMs}ms`;
+                } else {
+                    gsStatus.className = 'health-status-badge status-offline';
+                    gsStatus.innerHTML = '<i class="fas fa-times-circle"></i> Offline';
+                    gsDesc.innerText   = report.googleSheets.error || 'Connection Failed';
+                    gsLatency.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Err`;
+                }
+
+                // Update Upstash Redis Card
+                if (report.upstashRedis.online) {
+                    if (report.upstashRedis.count > 0) {
+                        redisStatus.className = 'health-status-badge status-online';
+                        redisStatus.innerHTML = '<i class="fas fa-check-circle"></i> Synced';
+                        redisDesc.innerText   = `Warm Cache (${report.upstashRedis.count} items)`;
+                    } else {
+                        redisStatus.className = 'health-status-badge status-loading';
+                        redisStatus.innerHTML = '<i class="fas fa-circle-notch"></i> Empty';
+                        redisDesc.innerText   = 'Cache empty (Needs sync)';
+                    }
+                    redisLatency.innerHTML = `<i class="fas fa-bolt"></i> ${report.upstashRedis.latencyMs}ms`;
+                } else {
+                    redisStatus.className = 'health-status-badge status-offline';
+                    redisStatus.innerHTML = '<i class="fas fa-times-circle"></i> Offline';
+                    redisDesc.innerText   = report.upstashRedis.error || 'Connection Failed';
+                    redisLatency.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Err`;
+                }
+            } catch (err) {
+                console.warn('Health check error:', err);
+            }
+        }
+
+        async function triggerManualSync() {
+            const btn = document.getElementById('btnSyncDBs');
+            const icon = document.getElementById('syncIcon');
+            btn.disabled = true;
+            icon.classList.add('fa-spin');
+            showToast('Synchronizing Google Sheets & Upstash Cache...', 'warn');
+
+            try {
+                if (window.NILSCacheService) {
+                    const freshData = await NILSCacheService.refreshAndSync(API_URL);
+                    allData = freshData;
+                    renderTable(allData);
+                    updateStats(allData);
+                    buildFilterCounts(allData);
+                    await checkDBHealth();
+                    showToast(`Successfully synchronized ${freshData.length} programmes!`, 'success');
+                }
+            } catch (err) {
+                showToast('Failed to sync databases: ' + (err.message || 'Error'), 'error');
+            } finally {
+                btn.disabled = false;
+                icon.classList.remove('fa-spin');
+            }
+        }
+
+        async function triggerFlushCache() {
+            const ok = await requestPin('Confirm Cache Clear', 'Enter PIN to clear the cloud & local cache.');
+            if (!ok) return;
+
+            showLoader('Flushing Cache...');
+            try {
+                if (window.NILSCacheService) {
+                    await NILSCacheService.invalidateCache();
+                }
+                document.getElementById('overlay').style.display = 'none';
+                showToast('Cache cleared successfully!', 'success');
+                await checkDBHealth();
+            } catch (e) {
+                document.getElementById('overlay').style.display = 'none';
+                showToast('Error clearing cache.', 'error');
+            }
+        }
+
         /* ── Init ─────────────────────────────────────────────────── */
         initTheme();
         loadAdminTable();
+        checkDBHealth();
     </script>
 </body>
 
