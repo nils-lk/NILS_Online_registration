@@ -1354,6 +1354,7 @@
         </div>
     </div>
 
+    <script src="nils-cache-service.js"></script>
     <script>
         /* ── Config ──────────────────────────────────────────────── */
         const API_URL      = "https://script.google.com/macros/s/AKfycbxlMiseZ5YjuzOFeNWSaJ5mqQ-EC5tWGIsFbRMGpTCBeGhiqZLLBJRI-Ch2ib6NjFEA/exec";
@@ -1484,12 +1485,17 @@
         /* ── Load ─────────────────────────────────────────────────── */
         async function loadAdminTable() {
             try {
-                const res = await fetch(API_URL);
-                allData = await res.json();
+                if (window.NILSCacheService) {
+                    allData = await NILSCacheService.fetchCoursesData(API_URL, { forceFresh: true });
+                } else {
+                    const res = await fetch(API_URL);
+                    allData = await res.json();
+                }
                 renderTable(allData);
                 updateStats(allData);
                 buildFilterCounts(allData);
             } catch (err) {
+                console.error("Admin load error:", err);
                 document.getElementById('tableBody').innerHTML = `
                     <tr><td colspan="4"><div class="empty-state">
                         <i class="fas fa-wifi" style="color:#f43f5e;"></i>
@@ -1613,6 +1619,9 @@
 
             try {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                if (window.NILSCacheService) {
+                    await NILSCacheService.invalidateCache();
+                }
                 showToast(rowId ? 'Programme updated successfully!' : 'Programme added successfully!', 'success');
                 setTimeout(() => window.location.reload(), 1500);
             } catch (err) {
@@ -1697,6 +1706,9 @@
                     mode: 'no-cors',
                     body: JSON.stringify({ action: 'delete', rowId: Number(id) })
                 });
+                if (window.NILSCacheService) {
+                    await NILSCacheService.invalidateCache();
+                }
                 showToast('Programme deleted successfully!', 'success');
                 setTimeout(() => window.location.reload(), 1500);
             } catch (err) {

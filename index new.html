@@ -550,6 +550,7 @@
         }
     </script>
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="nils-cache-service.js"></script>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxlMiseZ5YjuzOFeNWSaJ5mqQ-EC5tWGIsFbRMGpTCBeGhiqZLLBJRI-Ch2ib6NjFEA/exec";
@@ -569,15 +570,22 @@
 
         async function load() {
             try {
-                const r = await fetch(API_URL);
-                allData = await r.json();
+                if (window.NILSCacheService) {
+                    allData = await NILSCacheService.fetchCoursesData(API_URL);
+                } else {
+                    const r = await fetch(API_URL);
+                    allData = await r.json();
+                }
                 updateNav();
                 applyFilters();
                 // Deep-link: if the URL was opened with ?post=<id>, auto-open that post's modal
                 const params = new URLSearchParams(window.location.search);
                 const initialPost = params.get('post');
                 if (initialPost) openPost(initialPost, false);
-            } catch (e) { document.getElementById('loader').innerText = "Failed to load."; }
+            } catch (e) {
+                console.error("Failed to load courses:", e);
+                document.getElementById('loader').innerText = "Failed to load.";
+            }
         }
 
         function updateNav() {
