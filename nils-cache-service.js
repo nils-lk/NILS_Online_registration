@@ -2,15 +2,16 @@
  * NILS Online Registration - High-Performance Cache Service
  * 
  * Architecture:
- * 1. Tier 1: LocalStorage / Memory Micro-Cache (3 mins) -> 0ms ultra-fast local response
+ * 1. Tier 1: LocalStorage / Memory Micro-Cache (3 mins) -> 0ms ultra-fast local response (works in iframes & standalone)
  * 2. Tier 2: Upstash Redis REST Cache (30 mins TTL) -> ~30-60ms response from cloud cache
  * 3. Tier 3: Google Sheets Apps Script API (Master DB) -> Source of truth fallback
  * 
  * Features:
+ * - Direct Pre-Warming on Admin Updates (Upstash is instantly updated, never left empty)
+ * - Embed & Iframe Safe (Handles cross-origin sandboxes gracefully with in-memory fallback)
  * - Free-tier limit protection (Minimizes unnecessary Redis / Apps Script calls)
  * - Safe credential obfuscation (No plain-text tokens in GitHub repo)
  * - Automatic failover & silent fallback (If Redis is down/limited, seamlessly uses Google Sheets)
- * - Cache invalidation support for Admin actions
  */
 
 (function (global) {
@@ -43,8 +44,14 @@
         REDIS_KEY: 'nils_courses_v1',
         LOCAL_STORAGE_KEY: 'nils_courses_local_cache_v1',
         LOCAL_TTL_MS: 3 * 60 * 1000,    // 3 minutes local browser cache
-        REDIS_TTL_SEC: 1800,            // 30 minutes in Upstash Redis
+        REDIS_TTL_SEC: 86400,           // 24 hours in Upstash Redis (auto refreshed on admin edits)
         TIMEOUT_MS: 2500,               // 2.5s Redis fetch timeout
+    };
+
+    // ── In-Memory Fallback for Iframe / Sandboxed Environments ───────
+    let _memoryCache = {
+        timestamp: 0,
+        data: null
     };
 
     // ── Helper: Timeout Promise Wrapper ──────────────────────────────
@@ -57,35 +64,52 @@
         ]);
     }
 
-    // ── Local Storage Helpers ────────────────────────────────────────
+    // ── Local Storage Helpers (Embed & Iframe Safe) ───────────────────
     function getLocalCache() {
+        // First check memory cache
+        if (_memoryCache.data && (Date.now() - _memoryCache.timestamp < CACHE_CONFIG.LOCAL_TTL_MS)) {
+            return _memoryCache.data;
+        }
+
+        // Try localStorage safely
         try {
-            const item = localStorage.getItem(CACHE_CONFIG.LOCAL_STORAGE_KEY);
-            if (!item) return null;
-            const parsed = JSON.parse(item);
-            if (Date.now() - parsed.timestamp < CACHE_CONFIG.LOCAL_TTL_MS) {
-                return parsed.data;
+            if (typeof localStorage !== 'undefined') {
+                const item = localStorage.getItem(CACHE_CONFIG.LOCAL_STORAGE_KEY);
+                if (item) {
+                    const parsed = JSON.parse(item);
+                    if (Date.now() - parsed.timestamp < CACHE_CONFIG.LOCAL_TTL_MS) {
+                        _memoryCache = parsed;
+                        return parsed.data;
+                    }
+                }
             }
         } catch (e) {
-            // Local storage unavailable or full
+            // Iframe or cross-origin restrictions: silently ignore
         }
         return null;
     }
 
     function setLocalCache(data) {
+        _memoryCache = {
+            timestamp: Date.now(),
+            data: data
+        };
+
         try {
-            localStorage.setItem(CACHE_CONFIG.LOCAL_STORAGE_KEY, JSON.stringify({
-                timestamp: Date.now(),
-                data: data
-            }));
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(CACHE_CONFIG.LOCAL_STORAGE_KEY, JSON.stringify(_memoryCache));
+            }
         } catch (e) {
-            // Ignore storage quota errors
+            // Iframe or quota error: memory cache is active
         }
     }
 
     function clearLocalCache() {
+        _memoryCache = { timestamp: 0, data: null };
         try {
-            localStorage.removeItem(CACHE_CONFIG.LOCAL_STORAGE_KEY);
+            if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem(CACHE_CONFIG.LOCAL_STORAGE_KEY);
+            }
         } catch (e) {}
     }
 
@@ -100,7 +124,6 @@
             });
 
             if (!res.ok) {
-                // If 429 Too Many Requests (Rate limit hit), silently fallback
                 return null;
             }
 
@@ -120,7 +143,6 @@
     async function saveToRedis(data) {
         if (!REDIS_URL || !REDIS_TOKEN || !Array.isArray(data) || data.length === 0) return;
         try {
-            // Asynchronously set cache in Redis with TTL
             await fetch(`${REDIS_URL}/set/${CACHE_CONFIG.REDIS_KEY}?EX=${CACHE_CONFIG.REDIS_TTL_SEC}`, {
                 method: 'POST',
                 headers: {
@@ -165,7 +187,7 @@
     const NILSCacheService = {
         /**
          * Fetch courses data using intelligent multi-tier caching:
-         * 1. Checks Local Storage (instant)
+         * 1. Checks Local Storage / Memory (instant)
          * 2. Checks Upstash Redis (fast)
          * 3. Fallback to Google Sheets (master DB)
          * 
@@ -176,7 +198,7 @@
         async fetchCoursesData(apiUrl, options = {}) {
             const forceFresh = options.forceFresh === true;
 
-            // Step 1: Check Local Storage Micro-Cache (if not forced fresh)
+            // Step 1: Check Local Storage / Memory Micro-Cache (if not forced fresh)
             if (!forceFresh) {
                 const localData = getLocalCache();
                 if (localData && Array.isArray(localData) && localData.length > 0) {
@@ -196,10 +218,9 @@
             // Step 3: Fetch directly from Google Sheets API (Master DB)
             const freshData = await fetchFromGoogleSheets(apiUrl);
 
-            // Step 4: Update Caches in Background for subsequent users
+            // Step 4: Update Caches for subsequent requests
             if (Array.isArray(freshData) && freshData.length > 0) {
                 setLocalCache(freshData);
-                // Save to Redis asynchronously without blocking
                 saveToRedis(freshData).catch(() => {});
             }
 
@@ -207,8 +228,28 @@
         },
 
         /**
+         * Refreshes cache directly from Google Sheets and immediately warms Upstash Redis.
+         * Used after Admin creates, updates, or deletes a course.
+         * 
+         * @param {string} apiUrl - Google Apps Script exec URL
+         */
+        async refreshAndSync(apiUrl) {
+            try {
+                clearLocalCache();
+                const freshData = await fetchFromGoogleSheets(apiUrl);
+                if (Array.isArray(freshData) && freshData.length > 0) {
+                    setLocalCache(freshData);
+                    await saveToRedis(freshData);
+                }
+                return freshData;
+            } catch (e) {
+                console.warn('[NILS Cache] refreshAndSync error:', e);
+                await deleteFromRedis();
+            }
+        },
+
+        /**
          * Invalidate both local and cloud cache.
-         * Used after an Admin creates, updates, or deletes a course.
          */
         async invalidateCache() {
             clearLocalCache();
@@ -216,7 +257,7 @@
         },
 
         /**
-         * Directly warm / update cache with a fresh dataset
+         * Directly warm / update cache with a given dataset
          */
         async syncCache(data) {
             if (Array.isArray(data)) {

@@ -1620,7 +1620,7 @@
             try {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
                 if (window.NILSCacheService) {
-                    await NILSCacheService.invalidateCache();
+                    await NILSCacheService.refreshAndSync(API_URL);
                 }
                 showToast(rowId ? 'Programme updated successfully!' : 'Programme added successfully!', 'success');
                 setTimeout(() => window.location.reload(), 1500);
@@ -1707,7 +1707,7 @@
                     body: JSON.stringify({ action: 'delete', rowId: Number(id) })
                 });
                 if (window.NILSCacheService) {
-                    await NILSCacheService.invalidateCache();
+                    await NILSCacheService.refreshAndSync(API_URL);
                 }
                 showToast('Programme deleted successfully!', 'success');
                 setTimeout(() => window.location.reload(), 1500);
